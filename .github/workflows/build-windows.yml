@@ -67,10 +67,10 @@ jobs:
       - name: Build and test native app
         working-directory: source/${{ matrix.root }}
         run: ${{ matrix.command }}
-      - name: Check Mac architecture
+      -       - name: Check Mac architecture
         if: matrix.arch != ''
         working-directory: source/${{ matrix.root }}
-        run: lipo -verify_arch ${{ matrix.arch }} dist/WeddingFlow.app/Contents/MacOS/WeddingFlow
+        run: lipo "dist/WeddingFlow.app/Contents/MacOS/WeddingFlow" -verify_arch "${{ matrix.arch }}"
       - name: Upload app
         uses: actions/upload-artifact@v4
         with:
