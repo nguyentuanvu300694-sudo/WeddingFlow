@@ -1,4 +1,4 @@
-name: Build WeddingFlow 0.8 - Mac M, Intel, Windows
+name: Build WeddingFlow 0.9 - Mac M, Intel, Windows
 
 on:
   push:
@@ -21,27 +21,27 @@ jobs:
             runner: "macos-15"
             python_arch: "arm64"
             root: "WeddingFlow_Mac_M"
-            archive: "WeddingFlow_0.8_Mac_M.zip"
+            archive: "WeddingFlow_0.9_Mac_M.zip"
             arch: "arm64"
-            artifact: "WeddingFlow-0.8-Mac-M"
-            file: "dist/WeddingFlow_0.8_Mac_M_arm64.dmg"
+            artifact: "WeddingFlow-0.9-Mac-M"
+            file: "dist/WeddingFlow_0.9_Mac_M_arm64.dmg"
             command: "python mac_release.py"
           - label: "Mac Intel"
             runner: "macos-15-intel"
             python_arch: "x64"
             root: "WeddingFlow_Mac_Intel"
-            archive: "WeddingFlow_0.8_Mac_Intel.zip"
+            archive: "WeddingFlow_0.9_Mac_Intel.zip"
             arch: "x86_64"
-            artifact: "WeddingFlow-0.8-Mac-Intel"
-            file: "dist/WeddingFlow_0.8_Mac_Intel_x86_64.dmg"
+            artifact: "WeddingFlow-0.9-Mac-Intel"
+            file: "dist/WeddingFlow_0.9_Mac_Intel_x86_64.dmg"
             command: "python mac_release.py"
           - label: "Windows x64"
             runner: "windows-latest"
             python_arch: "x64"
             root: "WeddingFlow_Windows"
-            archive: "WeddingFlow_0.8_Windows.zip"
+            archive: "WeddingFlow_0.9_Windows.zip"
             arch: ""
-            artifact: "WeddingFlow-0.8-Windows"
+            artifact: "WeddingFlow-0.9-Windows"
             file: "dist/WeddingFlow.exe"
             command: "python windows_tools.py release"
     steps:
@@ -70,7 +70,8 @@ jobs:
       - name: Check Mac architecture
         if: matrix.arch != ''
         working-directory: source/${{ matrix.root }}
-        run: lipo "dist/WeddingFlow.app/Contents/MacOS/WeddingFlow" -verify_arch "${{ matrix.arch }}"
+        run: |
+          lipo "dist/WeddingFlow.app/Contents/MacOS/WeddingFlow" -verify_arch "${{ matrix.arch }}"
       - name: Upload app
         uses: actions/upload-artifact@v4
         with:
