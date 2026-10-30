@@ -1,4 +1,4 @@
-name: Build Windows EXE
+name: Build WeddingFlow 0.8 - Mac M, Intel, Windows
 
 on:
   push:
@@ -9,31 +9,72 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    runs-on: windows-latest
+  native-build:
+    name: ${{ matrix.label }}
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: "Mac chip M"
+            runner: "macos-15"
+            python_arch: "arm64"
+            root: "WeddingFlow_Mac_M"
+            archive: "WeddingFlow_0.8_Mac_M.zip"
+            arch: "arm64"
+            artifact: "WeddingFlow-0.8-Mac-M"
+            file: "dist/WeddingFlow_0.8_Mac_M_arm64.dmg"
+            command: "python mac_release.py"
+          - label: "Mac Intel"
+            runner: "macos-15-intel"
+            python_arch: "x64"
+            root: "WeddingFlow_Mac_Intel"
+            archive: "WeddingFlow_0.8_Mac_Intel.zip"
+            arch: "x86_64"
+            artifact: "WeddingFlow-0.8-Mac-Intel"
+            file: "dist/WeddingFlow_0.8_Mac_Intel_x86_64.dmg"
+            command: "python mac_release.py"
+          - label: "Windows x64"
+            runner: "windows-latest"
+            python_arch: "x64"
+            root: "WeddingFlow_Windows"
+            archive: "WeddingFlow_0.8_Windows.zip"
+            arch: ""
+            artifact: "WeddingFlow-0.8-Windows"
+            file: "dist/WeddingFlow.exe"
+            command: "python windows_tools.py release"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          architecture: "x64"
-      - name: Extract WeddingFlow 0.6.4
+          architecture: ${{ matrix.python_arch }}
+      - name: Extract source archive
         shell: python
+        env:
+          SOURCE_ARCHIVE: ${{ matrix.archive }}
         run: |
+          import os
           from pathlib import Path
           from zipfile import ZipFile
-          files = list(Path('.').glob('WeddingFlow_0.6.4_Windows*.zip'))
-          assert len(files) == 1, 'Upload exactly one WeddingFlow_0.6.4_Windows ZIP to the repository root'
+          archive = os.environ['SOURCE_ARCHIVE']
+          pattern = Path(archive).stem + '*.zip'
+          files = list(Path('.').glob(pattern))
+          assert len(files) == 1, 'Upload exactly one matching ZIP: ' + archive
           with ZipFile(files[0]) as z:
               z.extractall('source')
-      - name: Build and test EXE
-        working-directory: source/WeddingFlow
-        run: python windows_tools.py release
-      - name: Upload Windows app
+      - name: Build and test native app
+        working-directory: source/${{ matrix.root }}
+        run: ${{ matrix.command }}
+      - name: Check Mac architecture
+        if: matrix.arch != ''
+        working-directory: source/${{ matrix.root }}
+        run: lipo -verify_arch ${{ matrix.arch }} dist/WeddingFlow.app/Contents/MacOS/WeddingFlow
+      - name: Upload app
         uses: actions/upload-artifact@v4
         with:
-          name: WeddingFlow-0.6.4-Windows
-          path: source/WeddingFlow/dist/WeddingFlow.exe
+          name: ${{ matrix.artifact }}
+          path: source/${{ matrix.root }}/${{ matrix.file }}
           if-no-files-found: error
           retention-days: 14
