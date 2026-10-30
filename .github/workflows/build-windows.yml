@@ -1,4 +1,4 @@
-name: Build WeddingFlow 0.9 - Mac M, Intel, Windows
+name: Build WeddingFlow 0.9 - Release
 
 on:
   push:
