@@ -1,4 +1,4 @@
-name: Build WeddingFlow 0.9 - Mac M, Intel, Windows
+name: Build WEDDING LAYOUT AUTO 1.0.1 - Mac M, Intel, Windows
 
 on:
   push:
@@ -25,28 +25,28 @@ jobs:
             runner: "macos-15"
             python_arch: "arm64"
             root: "WeddingFlow_Mac_M"
-            archive: "WeddingFlow_0.9_Mac_M.zip"
+            archive: "WeddingLayoutAuto_1.0.1_Mac_M.zip"
             arch: "arm64"
-            artifact: "WeddingFlow-0.9-Mac-M"
-            file: "dist/WeddingFlow_0.9_Mac_M_arm64.dmg"
+            artifact: "WeddingLayoutAuto-1.0.1-Mac-M"
+            file: "dist/WeddingLayoutAuto_1.0.1_Mac_M_arm64.dmg"
             command: "python mac_release.py"
           - label: "Mac Intel"
             runner: "macos-15-intel"
             python_arch: "x64"
             root: "WeddingFlow_Mac_Intel"
-            archive: "WeddingFlow_0.9_Mac_Intel.zip"
+            archive: "WeddingLayoutAuto_1.0.1_Mac_Intel.zip"
             arch: "x86_64"
-            artifact: "WeddingFlow-0.9-Mac-Intel"
-            file: "dist/WeddingFlow_0.9_Mac_Intel_x86_64.dmg"
+            artifact: "WeddingLayoutAuto-1.0.1-Mac-Intel"
+            file: "dist/WeddingLayoutAuto_1.0.1_Mac_Intel_x86_64.dmg"
             command: "python mac_release.py"
           - label: "Windows x64"
             runner: "windows-latest"
             python_arch: "x64"
             root: "WeddingFlow_Windows"
-            archive: "WeddingFlow_0.9_Windows.zip"
+            archive: "WeddingLayoutAuto_1.0.1_Windows.zip"
             arch: ""
-            artifact: "WeddingFlow-0.9-Windows"
-            file: "dist/WeddingFlow.exe"
+            artifact: "WeddingLayoutAuto-1.0.1-Windows"
+            file: "dist/WEDDING LAYOUT AUTO.exe"
             command: "python windows_tools.py release"
     steps:
       - uses: actions/checkout@v4
@@ -68,13 +68,6 @@ jobs:
           assert len(files) == 1, 'Upload exactly one matching ZIP: ' + archive
           with ZipFile(files[0]) as z:
               z.extractall('source')
-          for path in Path('source').rglob('requirements*.txt'):
-              content = path.read_text(encoding='utf-8')
-              content = content.replace(
-                  'opencv-python-headless==4.10.0.94',
-                  'opencv-python-headless==4.10.0.84'
-              )
-              path.write_text(content, encoding='utf-8')
       - name: Build and test native app
         working-directory: source/${{ matrix.root }}
         run: ${{ matrix.command }}
@@ -82,7 +75,7 @@ jobs:
         if: matrix.arch != ''
         working-directory: source/${{ matrix.root }}
         run: |
-          lipo "dist/WeddingFlow.app/Contents/MacOS/WeddingFlow" -verify_arch "${{ matrix.arch }}"
+          lipo "dist/WEDDING LAYOUT AUTO - by NTV MEDIA from TNDP with love.app/Contents/MacOS/WEDDING LAYOUT AUTO" -verify_arch "${{ matrix.arch }}"
       - name: Upload app
         uses: actions/upload-artifact@v4
         with:
