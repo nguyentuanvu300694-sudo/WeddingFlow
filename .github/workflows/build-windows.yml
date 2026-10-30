@@ -12,28 +12,28 @@ jobs:
   build:
     runs-on: windows-latest
     timeout-minutes: 60
-
     steps:
-      - name: Download source
-        uses: actions/checkout@v4
-
-      - name: Install Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           architecture: "x64"
-
-      - name: Extract source ZIP
-        run: python -m zipfile -e "WeddingFlow_0.6_Mac_Windows (2).zip" source
-
-      - name: Build WeddingFlow EXE
+      - name: Extract WeddingFlow 0.6.4
+        shell: python
+        run: |
+          from pathlib import Path
+          from zipfile import ZipFile
+          files = list(Path('.').glob('WeddingFlow_0.6.4_Windows*.zip'))
+          assert len(files) == 1, 'Upload exactly one WeddingFlow_0.6.4_Windows ZIP to the repository root'
+          with ZipFile(files[0]) as z:
+              z.extractall('source')
+      - name: Build and test EXE
         working-directory: source/WeddingFlow
         run: python windows_tools.py release
-
       - name: Upload Windows app
         uses: actions/upload-artifact@v4
         with:
-          name: WeddingFlow-Windows
+          name: WeddingFlow-0.6.4-Windows
           path: source/WeddingFlow/dist/WeddingFlow.exe
           if-no-files-found: error
           retention-days: 14
